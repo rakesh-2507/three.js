@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Tour of Living Room</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            background-color: #333;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #startButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        #startButton:hover {
+            background-color: #0056b3;
+        }
+
+        #startButton:active {
+            background-color: #003f8a;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Button for activation -->
+    <button id="startButton">Start Virtual Tour</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lighting
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 10, 7.5);
+        scene.add(light);
+
+        // Load GLTF model with DRACO loader
+        const loader = new THREE.GLTFLoader();
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
+        loader.setDRACOLoader(dracoLoader);
+
+        loader.load(
+            'living room/forrakesh.gltf',  // Replace with your model path
+            function (gltf) {
+                const model = gltf.scene;
+                scene.add(model);
+
+                // Center the model
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.set(-center.x, -center.y, -center.z);
+
+                // Define boundaries based on the model's bounding box
+                const size = new THREE.Vector3();
+                box.getSize(size);
+                modelBoundaries = {
+                    minX: -size.x / 3,
+                    maxX: size.x / 3,
+                    minY: -size.y / 3,
+                    maxY: size.y / 3,
+                    minZ: -size.z / 3,
+                    maxZ: size.z / 3
+                };
+            },
+            undefined,
+            function (error) {
+                console.error('Error loading model:', error);
+            }
+        );
+
+        // Controls setup (Pointer Lock for first-person movement)
+        const controls = new THREE.PointerLockControls(camera, renderer.domElement);
+        let velocity = new THREE.Vector3();
+        let direction = new THREE.Vector3();
+        const clock = new THREE.Clock();
+        let canMove = false;
+
+        // Button to activate pointer lock and movement
+        const startButton = document.getElementById('startButton');
+        startButton.addEventListener('click', () => {
+            controls.lock();
+            canMove = true;  // Allow movement
+            startButton.style.display = 'none';  // Hide the button after activation
+        });
+
+        // Camera movement (first-person control)
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            velocity.set(0, 0, 0);
+            direction.set(0, 0, 0);
+
+            if (canMove) {
+                // Handle camera movement with WASD keys
+                const speed = 1;
+                if (keyboard[87]) {  // W
+                    direction.z = -0.5;
+                }
+                if (keyboard[83]) {  // S
+                    direction.z = 0.5;
+                }
+                if (keyboard[65]) {  // A
+                    direction.x = -0.5;
+                }
+                if (keyboard[68]) {  // D
+                    direction.x = 0.5;
+                }
+
+                velocity.addScaledVector(direction, speed * delta);
+                camera.position.add(velocity);
+
+                // Constrain camera to model boundaries
+                camera.position.x = Math.max(Math.min(camera.position.x, modelBoundaries.maxX), modelBoundaries.minX);
+                camera.position.y = Math.max(Math.min(camera.position.y, modelBoundaries.maxY), modelBoundaries.minY);
+                camera.position.z = Math.max(Math.min(camera.position.z, modelBoundaries.maxZ), modelBoundaries.minZ);
+            }
+
+            // Update rendering
+            renderer.render(scene, camera);
+        }
+
+        // Handle keyboard input
+        const keyboard = {};
+        window.addEventListener('keydown', (e) => {
+            keyboard[e.keyCode] = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            keyboard[e.keyCode] = false;
+        });
+
+        // Animation loop
+        animate();
+
+        // Resize handling
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+
+</html>

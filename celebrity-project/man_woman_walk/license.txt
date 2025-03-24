@@ -1,0 +1,11 @@
+Model Information:
+* title:	Man Woman Walk
+* source:	https://sketchfab.com/3d-models/man-woman-walk-bbaa566445074509a32ef5059a9d0bc2
+* author:	Iko Nia (https://sketchfab.com/iko.gazette)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Man Woman Walk" (https://sketchfab.com/3d-models/man-woman-walk-bbaa566445074509a32ef5059a9d0bc2) by Iko Nia (https://sketchfab.com/iko.gazette) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

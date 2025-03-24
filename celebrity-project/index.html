@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VILLA_PLOTS</title>
+
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Century Gothic', sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .image-container,
+        .svg-container,
+        .three-container {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .svg-container {
+            z-index: 2;
+        }
+
+        .svg-container polygon {
+            transition: fill 0.3s ease;
+        }
+
+        .svg-container polygon:hover {
+            fill: rgba(0, 183, 255, 0.7);
+        }
+
+        .three-container {
+            z-index: 3;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="image-container">
+        <img src="images/nimz1.jpg" alt="Map" id="image" style="width: 100vw;">
+    </div>
+
+    <div class="svg-container">
+        <svg id="svg-container" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480"></svg>
+    </div>
+
+    <div class="three-container" id="three-container"></div>
+
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.125/build/three.module.js';
+        import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.125/examples/jsm/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.125/examples/jsm/controls/OrbitControls.js';
+        import * as TWEEN from 'https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@18.6.4/dist/tween.esm.js';
+
+        const polygonsData = [
+            {
+                "name": "Park",
+                "coordinates": [
+                    { "x": 12.3, "y": 296.0 },
+                    { "x": 21.7, "y": 261.3 },
+                    { "x": 46.7, "y": 251.0 },
+                    { "x": 89.3, "y": 222.7 },
+                    { "x": 114.7, "y": 224.7 },
+                    { "x": 115.0, "y": 310.0 },
+                    { "x": 81.7, "y": 306.7 },
+                    { "x": 47.7, "y": 301.0 }
+                ]
+            },
+            //33
+            {
+                "coordinates": [{ "x": 131.3, "y": 311.3 },
+                { "x": 160.0, "y": 312.7 },
+                { "x": 160.3, "y": 289.0 },
+                { "x": 131.7, "y": 289.3 }],
+            },
+            //32
+            {
+                "coordinates": [{ "x": 160.3, "y": 289.0 },
+                { "x": 131.7, "y": 289.3 },
+                { "x": 131.7, "y": 270.0 },
+                { "x": 160.3, "y": 269.7 },
+                ],
+            },
+            //31
+            {
+                "coordinates": [{ "x": 131.7, "y": 269.7 },
+                { "x": 160.7, "y": 269.7 },
+                { "x": 161.0, "y": 250.3 },
+                { "x": 131.7, "y": 250.3 }],
+            },
+            //30
+            {
+                "coordinates": [
+                    { "x": 131.7, "y": 250.3 },
+                    { "x": 160.3, "y": 250.0 },
+                    { "x": 160.3, "y": 227.0 },
+                    { "x": 131.7, "y": 226.3 }
+                ]
+            },
+            //37
+            {
+                "coordinates": [
+                    { "x": 160.7, "y": 226.7 },
+                    { "x": 171.3, "y": 227.3 },
+                    { "x": 190.0, "y": 217.7 },
+                    { "x": 190.0, "y": 250.0 },
+                    { "x": 160.7, "y": 250.0 }
+                ]
+            },
+            //36
+            {
+                "coordinates": [
+                    { "x": 161.0, "y": 250.7 },
+                    { "x": 190.0, "y": 250.0 },
+                    { "x": 190.0, "y": 269.3 },
+                    { "x": 161.0, "y": 269.3 }
+                ]
+            },
+            //35
+            {
+                "coordinates": [
+                    { "x": 161.0, "y": 270.0 },
+                    { "x": 190.0, "y": 270.0 },
+                    { "x": 190.0, "y": 289.0 },
+                    { "x": 161.0, "y": 289.0 }
+                ]
+            },
+            //34
+            {
+                "coordinates": [
+                    { "x": 161.0, "y": 289.0 },
+                    { "x": 190.0, "y": 289.7 },
+                    { "x": 190.0, "y": 313.0 },
+                    { "x": 161.0, "y": 312.7 }
+                ]
+            },
+            //42
+            {
+                "coordinates": [
+                    { "x": 206.7, "y": 313.0 },
+                    { "x": 235.0, "y": 313.3 },
+                    { "x": 235.3, "y": 289.7 },
+                    { "x": 206.7, "y": 289.7 }
+                ]
+            },
+            //41
+            {
+                "coordinates": [
+                    { "x": 206.3, "y": 289.0 },
+                    { "x": 235.3, "y": 289.0 },
+                    { "x": 235.7, "y": 270.0 },
+                    { "x": 206.7, "y": 269.7 }
+                ]
+            },
+            //40
+            {
+                "coordinates": [
+                    { "x": 206.7, "y": 269.7 },
+                    { "x": 235.3, "y": 269.7 },
+                    { "x": 235.7, "y": 250.0 },
+                    { "x": 206.7, "y": 250.3 }
+                ]
+            },
+            //39
+            {
+                "coordinates": [
+                    { "x": 206.3, "y": 250.3 },
+                    { "x": 235.3, "y": 250.0 },
+                    { "x": 235.0, "y": 230.7 },
+                    { "x": 206.7, "y": 230.7 }
+                ]
+            },
+            //38
+            {
+                "coordinates": [
+                    { "x": 206.7, "y": 230.7 },
+                    { "x": 235.3, "y": 231.0 },
+                    { "x": 235.7, "y": 211.3 },
+                    { "x": 235.3, "y": 192.0 },
+                    { "x": 231.3, "y": 196.0 },
+                    { "x": 206.7, "y": 209.3 }
+                ]
+            },
+            //48
+            {
+                "coordinates": [
+                    { "x": 235.7, "y": 191.3 },
+                    { "x": 236.3, "y": 211.0 },
+                    { "x": 267.0, "y": 211.0 },
+                    { "x": 266.7, "y": 171.3 },
+                    { "x": 265.7, "y": 169.3 },
+                    { "x": 264.0, "y": 168.0 },
+                    { "x": 258.3, "y": 167.7 },
+                    { "x": 236.0, "y": 191.3 }
+                ]
+            },
+            //47
+            {
+                "coordinates": [
+                    { "x": 236.0, "y": 211.7 },
+                    { "x": 266.7, "y": 211.7 },
+                    { "x": 266.7, "y": 230.3 },
+                    { "x": 236.0, "y": 230.7 }
+                ]
+            },
+            //46
+            {
+                "coordinates": [
+                    { "x": 236.0, "y": 231.0 },
+                    { "x": 266.7, "y": 230.7 },
+                    { "x": 267.0, "y": 250.0 },
+                    { "x": 235.7, "y": 250.3 }
+                ]
+            },
+            //45
+            {
+                "coordinates": [
+                    { "x": 235.7, "y": 250.3 },
+                    { "x": 266.7, "y": 250.7 },
+                    { "x": 266.7, "y": 269.3 },
+                    { "x": 235.7, "y": 269.3 }
+                ]
+            },
+            //44
+            {
+                "coordinates": [
+                    { "x": 236.0, "y": 270.0 },
+                    { "x": 267.0, "y": 269.7 },
+                    { "x": 266.7, "y": 288.7 },
+                    { "x": 235.7, "y": 289.0 }
+                ]
+            },
+            //43
+            {
+                "coordinates": [
+                    { "x": 236.0, "y": 289.0 },
+                    { "x": 266.7, "y": 289.0 },
+                    { "x": 266.7, "y": 313.7 },
+                    { "x": 235.7, "y": 313.3 }
+                ]
+            },
+            //49
+            {
+                "coordinates": [
+                    { "x": 287.3, "y": 313.7 },
+                    { "x": 287.0, "y": 296.0 },
+                    { "x": 315.7, "y": 296.0 },
+                    { "x": 315.7, "y": 313.7 }
+                ]
+            },
+            //50
+            {
+                "coordinates": [
+                    { "x": 287.0, "y": 295.3 },
+                    { "x": 315.7, "y": 295.3 },
+                    { "x": 316.0, "y": 269.7 },
+                    { "x": 287.0, "y": 269.7 }
+                ]
+            },
+            //51
+            {
+                "coordinates": [
+                    { "x": 287.0, "y": 269.3 },
+                    { "x": 315.7, "y": 269.3 },
+                    { "x": 315.7, "y": 250.7 },
+                    { "x": 287.0, "y": 250.3 }
+                ]
+            },
+            //52
+            {
+                "coordinates": [
+                    { "x": 287.0, "y": 250.0 },
+                    { "x": 315.7, "y": 250.0 },
+                    { "x": 315.7, "y": 231.0 },
+                    { "x": 287.0, "y": 231.0 }
+                ]
+            },
+            //53
+            {
+                "coordinates": [
+                    { "x": 287.0, "y": 230.3 },
+                    { "x": 315.3, "y": 230.7 },
+                    { "x": 315.7, "y": 211.3 },
+                    { "x": 286.7, "y": 211.7 }
+                ]
+            },
+            //54
+            {
+                "coordinates": [
+                    { "x": 287.0, "y": 211.0 },
+                    { "x": 315.7, "y": 211.0 },
+                    { "x": 315.7, "y": 192.0 },
+                    { "x": 286.7, "y": 192.0 }
+                ]
+            },
+            //55
+            {
+                "coordinates": [
+                    { "x": 287.0, "y": 191.7 },
+                    { "x": 315.7, "y": 191.7 },
+                    { "x": 315.7, "y": 168.0 },
+                    { "x": 291.0, "y": 167.7 },
+                    { "x": 288.3, "y": 169.3 },
+                    { "x": 287.0, "y": 171.7 }
+                ]
+            },
+            //56
+            {
+                "coordinates": [
+                    { "x": 316.0, "y": 167.7 },
+                    { "x": 343.3, "y": 167.3 },
+                    { "x": 345.7, "y": 169.0 },
+                    { "x": 346.7, "y": 170.3 },
+                    { "x": 347.0, "y": 172.3 },
+                    { "x": 347.3, "y": 191.3 },
+                    { "x": 316.0, "y": 191.7 }
+                ]
+            },
+            //57
+            {
+                "coordinates": [
+                    { "x": 316.0, "y": 191.3 },
+                    { "x": 347.0, "y": 191.3 },
+                    { "x": 347.3, "y": 211.0 },
+                    { "x": 316.0, "y": 211.0 }
+                ]
+            },
+            //58
+            {
+                "coordinates": [
+                    { "x": 316.0, "y": 211.3 },
+                    { "x": 347.0, "y": 211.7 },
+                    { "x": 347.0, "y": 230.7 },
+                    { "x": 316.0, "y": 231.0 }
+                ]
+            },
+            //59
+            {
+                "coordinates": [
+                    { "x": 316.0, "y": 231.0 },
+                    { "x": 347, "y": 231.0 },
+                    { "x": 347.3, "y": 250.0 },
+                    { "x": 316.0, "y": 250.3 }
+                ]
+            },
+            //60
+            {
+                "coordinates": [
+                    { "x": 316.0, "y": 250.3 },
+                    { "x": 347.0, "y": 250.7 },
+                    { "x": 347.0, "y": 269.7 },
+                    { "x": 316.0, "y": 269.3 }
+                ]
+            },
+            //61
+            {
+                "coordinates": [
+                    { "x": 316.0, "y": 269.7 },
+                    { "x": 347.0, "y": 270.0 },
+                    { "x": 347.0, "y": 289 },
+                    { "x": 316.3, "y": 289 }
+                ]
+            },
+            //62
+            {
+                "coordinates": [
+                    { "x": 316.0, "y": 289.0 },
+                    { "x": 347.3, "y": 289.7 },
+                    { "x": 347.3, "y": 311.0 },
+                    { "x": 338.7, "y": 314.0 },
+                    { "x": 315.7, "y": 314.0 }
+                ]
+            },
+            //63
+            {
+                "coordinates": [
+                    { "x": 364.0, "y": 305.0 },
+                    { "x": 364.0, "y": 270.0 },
+                    { "x": 394.7, "y": 270.0 },
+                    { "x": 395.0, "y": 293.0 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 364.0, "y": 269.3 },
+                    { "x": 395.0, "y": 269.3 },
+                    { "x": 395.0, "y": 250.3 },
+                    { "x": 364, "y": 250.3 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 364.0, "y": 250.0 },
+                    { "x": 395.0, "y": 250.0 },
+                    { "x": 395.0, "y": 231.0 },
+                    { "x": 364.0, "y": 231.0 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 364.0, "y": 230.7 },
+                    { "x": 395.0, "y": 230.7 },
+                    { "x": 395.0, "y": 211.7 },
+                    { "x": 364.0, "y": 211.7 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 363.7, "y": 211.7 },
+                    { "x": 395.0, "y": 211.7 },
+                    { "x": 395.0, "y": 192.3 },
+                    { "x": 364.0, "y": 192.3 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 364.0, "y": 192.3 },
+                    { "x": 395.0, "y": 192.3 },
+                    { "x": 395.0, "y": 168 },
+                    { "x": 367.7, "y": 167.7 },
+                    { "x": 365.0, "y": 169.7 },
+                    { "x": 364.0, "y": 171.7 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 395.3, "y": 168.0 },
+                    { "x": 395.3, "y": 191.9 },
+                    { "x": 426.3, "y": 191.9 },
+                    { "x": 426.7, "y": 172.0 },
+                    { "x": 424.7, "y": 169.0 },
+                    { "x": 422.3, "y": 168.0 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 395.3, "y": 191.9 },
+                    { "x": 426.3, "y": 191.9 },
+                    { "x": 426.3, "y": 211.7 },
+                    { "x": 395.3, "y": 211.7 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 395.3, "y": 211.7 },
+                    { "x": 426.3, "y": 211.7 },
+                    { "x": 426.3, "y": 230.7 },
+                    { "x": 395.3, "y": 230.7 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 395.3, "y": 231.3 },
+                    { "x": 426.3, "y": 231.0 },
+                    { "x": 426.3, "y": 249.7 },
+                    { "x": 395.3, "y": 249.7 }
+                ]
+            },
+            //73
+            {
+                "coordinates": [
+                    { "x": 426.3, "y": 249.7 },
+                    { "x": 395.0, "y": 249.7 },
+                    { "x": 395.0, "y": 293.0 },
+                    { "x": 426.3, "y": 282.0 },
+
+                ]
+            },
+            //74
+            {
+                "coordinates": [
+                    { "x": 443.0, "y": 275.3 },
+                    { "x": 443.3, "y": 248.3 },
+                    { "x": 492.0, "y": 248.0 },
+                    { "x": 473.3, "y": 264.0 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 443.3, "y": 247.7 },
+                    { "x": 474.3, "y": 247.7 },
+                    { "x": 474.3, "y": 223.3 },
+                    { "x": 443.3, "y": 223.3 }
+                ]
+            },
+            {
+                "coordinates": [
+                    { "x": 443.3, "y": 223.3 },
+                    { "x": 474.3, "y": 223.3 },
+                    { "x": 474.3, "y": 199.3 },
+                    { "x": 443.3, "y": 199.3 }
+                ]
+            },
+            //77
+            {
+                "coordinates": [
+                    { "x": 443.3, "y": 199.3 },
+                    { "x": 474.3, "y": 199.3 },
+                    { "x": 474.3, "y": 168.0 },
+                    { "x": 447.3, "y": 168.0 },
+                    { "x": 444.7, "y": 169.0 },
+                    { "x": 443.3, "y": 172.0 }
+                ]
+            },
+            //78
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 168.0 },
+                    { "x": 499.0, "y": 168.0 },
+                    { "x": 498.7, "y": 198.7 },
+                    { "x": 475.0, "y": 198.7 }
+                ]
+            },
+            //79
+            {
+                "coordinates": [
+                    { "x": 499.0, "y": 168.0 },
+                    { "x": 522.0, "y": 168.0 },
+                    { "x": 522.0, "y": 198.7 },
+                    { "x": 499.0, "y": 198.7 }
+                ]
+            },
+            //80
+            {
+                "coordinates": [
+                    { "x": 522.0, "y": 168.0 },
+                    { "x": 550.7, "y": 168.0 },
+                    { "x": 542.5, "y": 198.8 },
+                    { "x": 522.0, "y": 198.8 }
+                ]
+            },
+            //81
+            {
+                "coordinates": [
+                    { "x": 474.7, "y": 198.8 },
+                    { "x": 474.7, "y": 223.7 },
+                    { "x": 522.7, "y": 223.3 },
+                    { "x": 534.3, "y": 213.7 },
+                    { "x": 539.7, "y": 206.7 },
+                    { "x": 542.5, "y": 198.8 }
+                ]
+            },
+            //82
+            {
+                "coordinates": [
+                    { "x": 474.7, "y": 223.3 },
+                    { "x": 522.3, "y": 223.3 },
+                    { "x": 492, "y": 247.5 },
+                    { "x": 474.7, "y": 247.5 }
+                ]
+            },
+            //1
+            {
+                "coordinates": [
+                    { "x": 562.0, "y": 128.7 },
+                    { "x": 556.7, "y": 147.7 },
+                    { "x": 526.7, "y": 147.7 },
+                    { "x": 523.7, "y": 146.3 },
+                    { "x": 522.3, "y": 143.0 },
+                    { "x": 522.3, "y": 128.7 },
+                    { "x": 562.0, "y": 128.7 }
+                ]
+            },
+            //2
+            {
+                "coordinates": [
+                    { "x": 522.3, "y": 112.8 },
+                    { "x": 541.7, "y": 112.8 },
+                    { "x": 541.7, "y": 128.8 },
+                    { "x": 522.3, "y": 128.8 }
+                ]
+            },
+            //3
+            {
+                "coordinates": [
+                    { "x": 522.3, "y": 96.3 },
+                    { "x": 522.3, "y": 112.8 },
+                    { "x": 541.7, "y": 112.8 },
+                    { "x": 541.7, "y": 96.7 }
+                ]
+            },
+            //4
+            {
+                "coordinates": [
+                    { "x": 541.7, "y": 128.5 },
+                    { "x": 541.7, "y": 112.8 },
+                    { "x": 566.3, "y": 112.8 },
+                    { "x": 562.0, "y": 128.5 }
+                ]
+            },
+            //5
+            {
+                "coordinates": [
+                    { "x": 541.7, "y": 96.7 },
+                    { "x": 541.7, "y": 112.9 },
+                    { "x": 566.3, "y": 112.9 },
+                    { "x": 572.3, "y": 96.7 }
+                ]
+            },
+            //6
+            {
+                "coordinates": [
+                    { "x": 522.3, "y": 96.7 },
+                    { "x": 572.3, "y": 96.7 },
+                    { "x": 579.3, "y": 78.0 },
+                    { "x": 574.0, "y": 70.0 },
+                    { "x": 522.7, "y": 70.3 }
+                ]
+            },
+            //7
+            {
+                "coordinates": [
+                    { "x": 522.7, "y": 50.7 },
+                    { "x": 522.7, "y": 70.0 },
+                    { "x": 574.0, "y": 70.0 },
+                    { "x": 561.0, "y": 50.7 }
+                ]
+            },
+            //8
+            {
+                "coordinates": [
+                    { "x": 522.7, "y": 50.7 },
+                    { "x": 561.0, "y": 50.7 },
+                    { "x": 555.3, "y": 42.0 },
+                    { "x": 522.9, "y": 5.9 }
+                ]
+            },
+            //9
+            {
+                "coordinates": [
+                    { "x": 506, "y": 9.9 },
+                    { "x": 506, "y": 30.9 },
+                    { "x": 475.0, "y": 30.9 },
+                    { "x": 475.0, "y": 17.7 }
+                ]
+            },
+            //10
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 30.9 },
+                    { "x": 506, "y": 30.9 },
+                    { "x": 506, "y": 50.7 },
+                    { "x": 475.0, "y": 50.7 }
+                ]
+            },
+            //11
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 50.7 },
+                    { "x": 505.7, "y": 50.7 },
+                    { "x": 505.7, "y": 69.7 },
+                    { "x": 475.0, "y": 70.0 }
+                ]
+            },
+            //12
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 70.3 },
+                    { "x": 506.0, "y": 70.3 },
+                    { "x": 505.7, "y": 89.3 },
+                    { "x": 475.0, "y": 89.3 }
+                ]
+            },
+            //13
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 89.3 },
+                    { "x": 506.0, "y": 89.3 },
+                    { "x": 506.0, "y": 108.7 },
+                    { "x": 475.0, "y": 108.7 }
+                ]
+            },
+            //14
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 109.0 },
+                    { "x": 505.7, "y": 109.0 },
+                    { "x": 505.7, "y": 128.3 },
+                    { "x": 475.0, "y": 128.3 }
+                ]
+            },
+            //15
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 128.7 },
+                    { "x": 506.0, "y": 128.3 },
+                    { "x": 505.7, "y": 143.7 },
+                    { "x": 504.7, "y": 146.3 },
+                    { "x": 502.0, "y": 147.7 },
+                    { "x": 475.0, "y": 147.7 }
+                ]
+            },
+            //16
+            {
+                "coordinates": [
+                    { "x": 475.0, "y": 128.3 },
+                    { "x": 475.0, "y": 147.7 },
+                    { "x": 446.7, "y": 147.7 },
+                    { "x": 444.7, "y": 146.3 },
+                    { "x": 443.3, "y": 144.7 },
+                    { "x": 443.3, "y": 128.7 }
+                ]
+            },
+            //17
+            {
+                "coordinates": [
+                    { "x": 443.3, "y": 128.7 },
+                    { "x": 443.3, "y": 109.3 },
+                    { "x": 474.9, "y": 109.3 },
+                    { "x": 474.9, "y": 128.7 }
+                ]
+            },
+            //18
+            {
+                "coordinates": [
+                    { "x": 443.0, "y": 89.7 },
+                    { "x": 474.3, "y": 89.7 },
+                    { "x": 474.3, "y": 109 },
+                    { "x": 443.0, "y": 109 }
+                ]
+            },
+            //19
+            {
+                "coordinates": [
+                    { "x": 443.3, "y": 89.7 },
+                    { "x": 474.3, "y": 89.7 },
+                    { "x": 474.3, "y": 70.7 },
+                    { "x": 443.3, "y": 70.7 }
+                ]
+            },
+            //20
+            {
+                "coordinates": [
+                    { "x": 443.0, "y": 70.0 },
+                    { "x": 474.3, "y": 69.7 },
+                    { "x": 474.3, "y": 51.0 },
+                    { "x": 443.3, "y": 51.0 }
+                ]
+            },
+            //21
+            {
+                "coordinates": [
+                    { "x": 443.0, "y": 51.0 },
+                    { "x": 474.9, "y": 51.0 },
+                    { "x": 474.9, "y": 17.7 },
+                    { "x": 443.0, "y": 27.0 }
+                ]
+            },
+            //22
+            {
+                "coordinates": [
+                    { "x": 426.3, "y": 32.0 },
+                    { "x": 395.0, "y": 41.3 },
+                    { "x": 395.3, "y": 69.7 },
+                    { "x": 426.3, "y": 69.7 }
+                ]
+            },
+            //23
+            {
+                "coordinates": [
+                    { "x": 395.7, "y": 69.7 },
+                    { "x": 426.3, "y": 69.7 },
+                    { "x": 426.3, "y": 89.3 },
+                    { "x": 395.7, "y": 89.3 }
+                ]
+            },
+            //24
+            {
+                "coordinates": [
+                    { "x": 395.7, "y": 89.3 },
+                    { "x": 426.3, "y": 89.3 },
+                    { "x": 426.3, "y": 108.7 },
+                    { "x": 395.3, "y": 108.7 }
+                ]
+            },
+            //25
+            {
+                "coordinates": [
+                    { "x": 395.7, "y": 108.7 },
+                    { "x": 426.3, "y": 108.7 },
+                    { "x": 426.3, "y": 128.3 },
+                    { "x": 395.7, "y": 128.3 }
+                ]
+            },
+            //26
+            {
+                "coordinates": [
+                    { "x": 395.7, "y": 128.3 },
+                    { "x": 426.7, "y": 128.3 },
+                    { "x": 426.3, "y": 144.3 },
+                    { "x": 425.0, "y": 146.3 },
+                    { "x": 422.7, "y": 147.7 },
+                    { "x": 395.7, "y": 147.7 }
+                ]
+            },
+            //29
+            {
+                "coordinates": [
+                    { "x": 395, "y": 41.7 },
+                    { "x": 395.5, "y": 108.7 },
+                    { "x": 363.7, "y": 108.7 },
+                    { "x": 364.0, "y": 70.0 }
+                ]
+            },
+            //28
+            {
+                "coordinates": [
+                    { "x": 395.5, "y": 108.7 },
+                    { "x": 395.5, "y": 128.3 },
+                    { "x": 364.0, "y": 128.3 },
+                    { "x": 364.0, "y": 108.7 }
+                ]
+            },
+            //27
+            {
+                "coordinates": [
+                    { "x": 364.0, "y": 128.3 },
+                    { "x": 395.5, "y": 128.3 },
+                    { "x": 395.5, "y": 147.7 },
+                    { "x": 368.0, "y": 147.7 },
+                    { "x": 365.0, "y": 146.0 },
+                    { "x": 364.0, "y": 143.7 },
+                    { "x": 364.0, "y": 128.3 }
+                ]
+            },
+            //park
+            {
+                "coordinates": [
+                    { "x": 347.3, "y": 85.3 },
+                    { "x": 347.3, "y": 143.3 },
+                    { "x": 346.5, "y": 146.0 },
+                    { "x": 344.5, "y": 147.9 },
+                    { "x": 276.7, "y": 147.9 },
+                    { "x": 299.3, "y": 124.0 }
+                ]
+            }
+        ];
+
+        const svgContainer = document.getElementById('svg-container');
+
+        function drawPolygons() {
+            svgContainer.innerHTML = '';
+            polygonsData.forEach(polygonData => {
+                const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                polygon.setAttribute('points', polygonData.coordinates.map(p => `${p.x},${p.y}`).join(' '));
+                polygon.setAttribute('stroke', '#2980b9');
+                polygon.setAttribute('stroke-width', '1');
+                polygon.setAttribute('fill', 'rgba(82, 194, 238, 0.1)');
+                polygon.addEventListener('click', () => placeModel(polygonData.coordinates));
+                svgContainer.appendChild(polygon);
+            });
+        }
+
+        function convertTo3DPosition(x, y) {
+            return { x: (x - 320) / 50, y: (480 - y) / 50 };
+        }
+
+
+        let scene, camera, renderer, controls;
+        let model1, model2, model3;
+        let mixer;
+
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(25, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(6, 9, 6);
+
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById("three-container").appendChild(renderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            const light = new THREE.DirectionalLight(0xffffff, 2);
+            light.position.set(5, 10, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 3));
+
+            // const gridHelper = new THREE.GridHelper(10, 10);
+            // scene.add(gridHelper);
+
+            loadModels();
+            animate();
+        }
+
+
+        function loadModels() {
+            const loader = new GLTFLoader();
+
+            loader.load('car_modal/scene.gltf', function (gltf) {
+                model1 = gltf.scene;
+                model1.scale.set(6, 6, 6);
+                model1.position.set(0.2, 0.95, 1);
+                scene.add(model1);
+                model1.rotation.y = 2.45;
+                console.log("✅ Model 1 Loaded");
+
+                function startModel1Animation() {
+                    moveAlongPath(model1, path1_model1, () =>
+                        rotateModel(model1, rotation1_model1, () =>
+                            moveAlongPath(model1, path2_model1, () =>
+                                rotateModel(model1, rotation2_model1, () =>
+                                    moveAlongPath(model1, path3_model1, () =>
+                                        rotateModel(model1, rotation3_model1, () =>
+                                            moveAlongPath(model1, path4_model1, () => {
+                                                model1.position.set(0.2, 0.95, 1);
+                                                model1.rotation.y = 2.45;
+                                                startModel1Animation();
+                                            })
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    );
+                }
+
+                startModel1Animation();
+            });
+
+            loader.load('lamborghini_huracan_twin_turbo_lost/scene.gltf', function (gltf) {
+                model2 = gltf.scene;
+                model2.scale.set(0.05, 0.05, 0.05);
+                model2.position.set(4.33, 5.1, 1);
+                scene.add(model2);
+                model2.rotation.y = 0.2;
+                console.log("✅ Model 2 Loaded");
+
+                function startModel2Animation() {
+                    moveAlongPath(model2, path1_model2, () =>
+                        rotateModel(model2, rotation1_model2, () =>
+                            moveAlongPath(model2, path2_model2, () =>
+                                rotateModel(model2, rotation2_model2, () =>
+                                    moveAlongPath(model2, path3_model2, () =>
+                                        rotateModel(model2, rotation3_model2, () =>
+                                            moveAlongPath(model2, path4_model2, () =>
+                                                rotateModel(model2, rotation4_model2, () =>
+                                                    rotateModel(model2, rotation5_model2, () =>
+                                                        moveAlongPath(model2, path5_model2, () =>
+                                                            rotateModel(model2, rotation6_model2, () =>
+                                                                moveAlongPath(model2, path6_model2, () =>
+                                                                    rotateModel(model2, rotation7_model2, () =>
+                                                                        moveAlongPath(model2, path7_model2, () => {
+                                                                            model2.scale.set(0.05, 0.05, 0.05);
+                                                                            model2.position.set(4.33, 5.1, 1);
+                                                                            model2.rotation.y = 0.2;
+                                                                            startModel2Animation();
+                                                                        })
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    );
+                }
+
+                startModel2Animation();
+            });
+
+            loader.load('man_woman_walk/scene.gltf', function (gltf) {
+                model3 = gltf.scene;
+                model3.scale.set(0.2, 0.2, 0.2);
+                model3.position.set(-20, -26, 1);
+                scene.add(model3);
+                model3.rotation.y = 2;
+                console.log("✅ Model 3 Loaded");
+
+                mixer = new THREE.AnimationMixer(model3);
+                let walkAction = mixer.clipAction(gltf.animations[0]);               
+                walkAction.play();
+
+                function startModel3Animation() {
+                    walkAction.reset().play(); 
+                    walkAlongPath(model3, path1_model3, () =>
+                        walkAlongPath(model3, path2_model3, () =>
+                            walkAlongPath(model3, path3_model3, () => {
+                                rotateModelBeforePath4(() => {
+                                    walkAlongPath(model3, path4_model3, resetAndRestartModel3);
+                                });
+                            })
+                        )
+                    );
+                }
+
+                function resetAndRestartModel3() {
+                    console.log("🔄 Resetting Model 3...");
+
+                    mixer.stopAllAction();
+
+                    model3.position.set(-20, -26, 1);
+                    model3.scale.set(0.2, 0.2, 0.2);
+                    model3.rotation.set(0, 2, 0); 
+
+                    walkAction = mixer.clipAction(gltf.animations[0]); 
+                    walkAction.reset().play(); 
+
+                    startModel3Animation();
+                }
+
+                startModel3Animation();
+            });
+
+            function rotateModelBeforePath4(callback) {
+                console.log("🔄 Rotating before Path 4...");
+
+                new TWEEN.Tween(model3.rotation)
+                    .to({ y: model3.rotation.y + Math.PI / 1.5 }, 500)
+                    .easing(TWEEN.Easing.Quadratic.Out)
+                    .onComplete(() => {
+                        console.log("✅ Rotation Done! Starting Path 4...");
+                        callback(); 
+                    })
+                    .start();
+            }
+
+        }
+
+
+        const scalePoints = [
+            { x: -7, y: -11.8, z: 1, scale: 0.15 },
+            { x: -0.4, y: -4, z: 1, scale: 0.07 },
+        ];
+
+        function placeModel(coordinates) {
+            if (!model1) {
+                console.error("❌ Model not loaded");
+                return;
+            }
+            const avgX = coordinates.reduce((sum, p) => sum + p.x, 0) / coordinates.length;
+            const avgY = coordinates.reduce((sum, p) => sum + p.y, 0) / coordinates.length;
+            const pos3D = convertTo3DPosition(avgX, avgY);
+            model1.position.set(pos3D.x, 0.5, pos3D.y);
+            console.log("✅ Model moved to:", pos3D);
+        }
+
+        const path1_model1 = [
+            { x: 0.2, y: 0.95, z: 1 },
+            { x: 0.5, y: 1.2, z: 1 },
+            { x: 1, y: 1.6, z: 1 },
+            { x: 1.5, y: 2, z: 1 },
+            { x: 2, y: 2.35, z: 1 },
+            { x: 2.5, y: 2.7, z: 1 },
+            { x: 3, y: 3.1, z: 1 },
+            { x: 3.5, y: 3.45, z: 1 },
+            { x: 4, y: 3.8, z: 1 },
+            { x: 4.2, y: 3.95, z: 1 },
+        ];
+
+        const path2_model1 = [
+            { x: 4.2, y: 4.1, z: 1 },
+            { x: 4.2, y: 4.3, z: 1 },
+            { x: 4.2, y: 4.5, z: 1 },
+            { x: 4.2, y: 4.7, z: 1 },
+            { x: 4.23, y: 4.9, z: 1 },
+            { x: 4.25, y: 5.1, z: 1 },
+        ];
+
+        const path3_model1 = [
+            { x: 4.25, y: 5.1, z: 1 },
+            { x: 4.33, y: 5.1, z: 1 },
+            { x: 4.33, y: 4.9, z: 1 },
+            { x: 4.3, y: 4.7, z: 1 },
+        ];
+
+        const path4_model1 = [
+            { x: 4.35, y: 4.5, z: 1.1 },
+            { x: 4.35, y: 4.3, z: 1.1 },
+            { x: 4.36, y: 4.1, z: 1.1 },
+            { x: 4.37, y: 3.9, z: 1.1 },
+            { x: 4.38, y: 3.7, z: 1.1 },
+        ];
+
+
+
+
+        const path1_model2 = [
+            { x: 4.25, y: 5.1, z: 1 },
+            { x: 4.33, y: 5.1, z: 1 },
+            { x: 4.33, y: 4.9, z: 1 },
+            { x: 4.3, y: 4.7, z: 1 },
+        ];
+
+        const path2_model2 = [
+            { x: 4.35, y: 4.5, z: 1.1 },
+            { x: 4.35, y: 4.3, z: 1.1 },
+            { x: 4.36, y: 4.1, z: 1.1 },
+            { x: 4.37, y: 3.9, z: 1.1 },
+            { x: 4.38, y: 3.7, z: 1.1 },
+            { x: 4.39, y: 3.5, z: 1.1 },
+            { x: 4.39, y: 3.45, z: 1.1 },
+            { x: 4.39, y: 3.4, z: 1.1 },
+            { x: 4.39, y: 3.35, z: 1.1 }
+        ];
+        const path3_model2 = [
+            { x: 4.39, y: 3.25, z: 1.1 },
+            { x: 4.34, y: 3.1, z: 1.1 },
+            { x: 4.34, y: 3.1, z: 1.1 },
+        ];
+        const path4_model2 = [
+            { x: 4.34, y: 3.1, z: 1.1 },
+            { x: 4.25, y: 2.8, z: 1 },
+            { x: 4.15, y: 2.5, z: 1 },
+            { x: 4.02, y: 2.2, z: 1 },
+            { x: 3.97, y: 2.0, z: 1 },
+            { x: 3.9, y: 1.8, z: 1 },
+            { x: 3.85, y: 1.6, z: 1 },
+        ];
+        const path5_model2 = [
+            { x: 3.85, y: 1.6, z: 1 },
+            { x: 3.8, y: 1.5, z: 1 },
+            { x: 3.7, y: 1.3, z: 1 },
+            { x: 3.58, y: 1.1, z: 1 },
+            { x: 3.4, y: 0.8, z: 1 },
+            { x: 3.3, y: 0.6, z: 1 },
+            { x: 3.1, y: 0.3, z: 1 },
+            { x: 3, y: 0.1, z: 1 },
+            { x: 2.82, y: -0.2, z: 1 },
+            { x: 2.67, y: -0.5, z: 1 },
+            { x: 2.5, y: -0.8, z: 1 },
+            { x: 2.35, y: -1.1, z: 1 },
+        ];
+        const path6_model2 = [
+            { x: 2.35, y: -1.1, z: 1 },
+            { x: 1.9, y: -1.1, z: 1 },
+        ];
+        const path7_model2 = [
+            { x: 1.9, y: -1.1, z: 1 },
+            { x: 1.72, y: -1.07, z: 1 },
+        ];
+
+
+        const path1_model3 = [
+            { x: -20, y: -26, z: 1 },
+            { x: -19.5, y: -25.5, z: 1 },
+        ];
+        const path2_model3 = [
+            { x: -19.5, y: -25.5, z: 1 },
+            { x: -18, y: -23.7, z: 1 },
+            { x: -17, y: -22.7, z: 1 },
+            { x: -16, y: -21.7, z: 1 },
+            { x: -15, y: -20.4, z: 1 },
+            { x: -14, y: -19.4, z: 1 },
+            { x: -13, y: -18.2, z: 1 },
+            { x: -12, y: -17.2, z: 1 },
+            { x: -11, y: -16.2, z: 1 },
+            { x: -10, y: -15, z: 1 },
+            { x: -9, y: -13.8, z: 1 },
+            { x: -8, y: -12.8, z: 1 },
+            { x: -7, y: -11.8, z: 1 },
+            { x: -6, y: -10.8, z: 1 },
+        ];
+        const path3_model3 = [
+            { x: -6, y: -9.8, z: 1 },
+            { x: -5, y: -9.6, z: 1 },
+            { x: -4, y: -8.5, z: 1 },
+            { x: -3, y: -7.3, z: 1 },
+            { x: -2, y: -6.1, z: 1 },
+            { x: -1, y: -4.9, z: 1 },
+            { x: -0.4, y: -4, z: 1 },
+        ];
+        const path4_model3 = [
+            { x: -0.4, y: -9, z: 1 },
+            { x: -0.4, y: -3.5, z: 1 },
+            { x: -0.4, y: -3, z: 1 },
+            { x: -0.3, y: -2.5, z: 1 },
+            { x: -0.3, y: -2, z: 1 },
+            { x: -0.26, y: -1.5, z: 1 },
+            { x: -0.26, y: -1, z: 1 },
+            { x: -0.23, y: -1, z: 1 },
+            { x: -0.2, y: -0.5, z: 1 },
+            { x: -0.15, y: 0, z: 1 },
+
+        ];
+
+
+
+
+        const rotation1_model1 = [2.4, 2.6, 2.8, 3, 3.2, 3.4, 3.5];
+        const rotation2_model1 = [2, 1.8, 1.6, 1.4, 1.2, 1, 0.8, 0.6, 0.4, 0.2];
+        const rotation3_model1 = [0.35];
+
+        const rotation1_model2 = [0.35];
+        const rotation2_model2 = [0.1];
+        const rotation3_model2 = [-0.09];
+        const rotation4_model2 = [0.05];
+        const rotation5_model2 = [-0.3];
+        const rotation6_model2 = [-1.5];
+        const rotation7_model2 = [-2.4];
+
+
+
+        function moveAlongPath(object, path, onComplete) {
+            let index = 0;
+            const scalePoints = [
+                { x: 3.8, y: 1.5, z: 1, scale: 0.07 },
+                { x: 3.1, y: 0.3, z: 1, scale: 0.08 },
+                { x: 1.72, y: -1.07, z: 1, scale: 0.07 },
+            ];
+
+            function move() {
+                if (index >= path.length - 1) {
+                    if (onComplete) onComplete();
+                    return;
+                }
+
+                const start = path[index];
+                const end = path[index + 1];
+                const duration = 1000;
+
+                new TWEEN.Tween(object.position)
+                    .to({ x: end.x, y: end.y, z: end.z }, duration)
+                    .easing(TWEEN.Easing.Linear.None)
+                    .onUpdate(() => {
+                        scalePoints.forEach(point => {
+                            if (end.x === point.x && end.y === point.y && end.z === point.z) {
+                                object.scale.set(point.scale, point.scale, point.scale);
+                            }
+                        });
+                    })
+                    .onComplete(() => {
+                        index++;
+                        move();
+                    })
+                    .start();
+            }
+
+            move();
+        }
+
+        function walkAlongPath(object, path, onComplete) {
+            let index = 0;
+
+            function move() {
+                if (index >= path.length - 1) {
+                    if (onComplete) onComplete();
+                    return;
+                }
+
+                const start = path[index];
+                const end = path[index + 1];
+                const duration = 1000; 
+
+                new TWEEN.Tween(object.position)
+                    .to({ x: end.x, y: end.y, z: end.z }, duration)
+                    .easing(TWEEN.Easing.Linear.None)
+                    .onUpdate(() => {
+
+                        scalePoints.forEach(point => {
+                            if (end.x === point.x && end.y === point.y && end.z === point.z) {
+                                object.scale.set(point.scale, point.scale, point.scale);
+                            }
+                        });
+                    })
+                    .onComplete(() => {
+                        index++;
+                        move();
+                    })
+                    .start();
+            }
+
+            move();
+        }
+
+        function rotateModel(object, rotations, onComplete) {
+            let index = 0;
+
+            function rotate() {
+                if (index >= rotations.length) {
+                    if (onComplete) onComplete();
+                    return;
+                }
+
+                new TWEEN.Tween(object.rotation)
+                    .to({ y: rotations[index] }, 100)
+                    .easing(TWEEN.Easing.Quadratic.Out)
+                    .onComplete(() => {
+                        index++;
+                        rotate();
+                    })
+                    .start();
+            }
+
+            rotate();
+        }
+
+
+        function animate() {
+            requestAnimationFrame(animate);
+            TWEEN.update();
+            if (mixer) mixer.update(0.016);
+            renderer.render(scene, camera);
+        }
+
+        window.onload = () => {
+            drawPolygons();
+            initThreeJS();
+        };
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+
+</html>
